@@ -1,95 +1,89 @@
-import Image from "next/image";
+import { DateTime } from "luxon";
 import styles from "./page.module.css";
 
-export default function Home() {
+const date = DateTime.local().toString();
+
+export default async function Home() {
+  const [metaData, today] = await Promise.all([
+    await fetch("http://localhost:3000/api/metaData"),
+    await fetch(`http://localhost:3000/api/today?date=${date}`),
+  ]);
+
+  const [metaDataResults, todayResults] = await Promise.all([
+    await metaData.json(),
+    await today.json(),
+  ]);
+
+  const { orderData, milkData } = metaDataResults;
+  const { orders, milk, best, worst } = todayResults;
+
+  const { paidOrders, unpaidOrders } = orderData.reduce(
+    (acc, order) => {
+      if (order.PaymentStatus === true) {
+        acc.paidOrders.push(order); // Add to paid orders if PaymentStatus is true
+      } else {
+        acc.unpaidOrders.push(order); // Add to unpaid orders if PaymentStatus is false
+      }
+      return acc;
+    },
+    { paidOrders: [], unpaidOrders: [] } // Initial structure with empty arrays
+  );
+
+  const { paidOrdersToday, unpaidOrdersToday } = orders.reduce(
+    (acc, order) => {
+      if (order.PaymentStatus === true) {
+        acc.paidOrders.push(order); // Add to paid orders if PaymentStatus is true
+      } else {
+        acc.unpaidOrders.push(order); // Add to unpaid orders if PaymentStatus is false
+      }
+      return acc;
+    },
+    { paidOrders: [], unpaidOrders: [] } // Initial structure with empty arrays
+  );
+
+  const paidAll = paidOrders.reduce((total, sale) => {
+    total += sale.AmountPaid;
+    return total;
+  });
+  const paidToday = paidOrdersToday.reduce((total, sale) => {
+    total += sale.AmountPaid;
+    return total;
+  });
+
+  const unpaidAll = unpaidOrders.reduce((total, sale) => {
+    total += sale.AmountPaid;
+    return total;
+  });
+  const unpaidToday = unpaidOrdersToday.reduce((total, sale) => {
+    total += sale.AmountPaid;
+    return total;
+  });
+
+  const milkCostToday = milk[0].Cost;
+  const grossProfit = paidToday - milkCostToday;
+  const expectedProfit = paidToday + unpaidToday - milkCostToday;
+
+  const milkAll = milkData.reduce((total, milk) => {
+    total += milk.Cost;
+    return total;
+  });
+  const grossAll = paidAll - milkAll;
+  const expectedAll = paidAll + unpaidAll - milkAll;
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+      <div>
+        Total Milk Cost:{milkCostToday} Total Sales: {paidToday} Current Gross
+        Profit :{grossProfit} Expected Gross Profit:{expectedProfit}
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div>Total Sales amount Grahp per day</div>
+      <div>Gross Profit graph per day</div>
+      <div>Orders per day graph</div>
+      <div>
+        Paid {paidToday} vs Unpaid {unpaidToday}
       </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <div>Highest Buyer</div>
+      <div>Hihest debtor</div>
     </main>
   );
 }
