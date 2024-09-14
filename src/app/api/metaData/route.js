@@ -1,9 +1,11 @@
 import { query } from "../../../../db";
 import { NextResponse } from "next/server";
 
-export async function GET(req) {
+export const dynamic = "force-dynamic";
+
+export async function GET(request) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
     const dateOnly = date.split("T")[0];
     const getOrdersPaid = `SELECT 

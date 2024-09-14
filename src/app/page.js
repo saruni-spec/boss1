@@ -1,42 +1,67 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { DateTime } from "luxon";
 import styles from "./page.module.css";
 import OrdersGraph from "./components/OrdersGraph";
 import SalesGraph from "./components/SalesGraph";
 import Comparison from "./components/Comparison";
 
-const date = DateTime.local().toString();
+export default function Home() {
+  const [metaDataResults, setMetaDataResults] = useState({
+    orderData: [],
+    milkData: [],
+  });
+  const [todayResults, setTodayResults] = useState({
+    orders: [],
+    milk: [],
+    best: null,
+    worst: null,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default async function Home() {
-  let metaDataResults = { orderData: [], milkData: [] };
-  let todayResults = { orders: [], milk: [], best: null, worst: null };
+  useEffect(() => {
+    const fetchData = async () => {
+      const date = DateTime.local().toISO();
+      setIsLoading(true);
+      try {
+        const [todayResponse, metaDataResponse] = await Promise.all([
+          fetch(`/api/today?date=${date}`),
+          fetch(`/api/metaData?date=${date}`),
+        ]);
 
-  try {
-    const [today, metaData] = await Promise.all([
-      fetch(`http://localhost:3000/api/today?date=${date}`),
-      fetch(`http://localhost:3000/api/metaData?date=${date}`),
-    ]);
+        if (!todayResponse.ok || !metaDataResponse.ok) {
+          throw new Error("Failed to fetch data");
+        }
 
-    metaDataResults = (await metaData.json())?.data || {
-      orderData: [],
-      milkData: [],
+        const todayData = await todayResponse.json();
+        const metaData = await metaDataResponse.json();
+
+        setTodayResults(
+          todayData.data || { orders: [], milk: [], best: null, worst: null }
+        );
+        setMetaDataResults(metaData.data || { orderData: [], milkData: [] });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    todayResults = (await today.json())?.data || {
-      orders: [],
-      milk: [],
-      best: null,
-      worst: null,
-    };
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
+
+    fetchData();
+  }, []);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   const { orderData = [], milkData = [] } = metaDataResults;
   const { orders = [], milk = [], best = null, worst = null } = todayResults;
 
   // Safely extract order data
-  const { paidOrders = [], unpaidOrders = [] } = orderData || {};
-
-  const { paidOrdersToday = [{}], unpaidOrdersToday = [{}] } = orders || [{}];
+  const { paidOrders = [], unpaidOrders = [] } = orderData;
+  const { paidOrdersToday = [{}], unpaidOrdersToday = [{}] } = orders;
 
   const paidAll = paidOrders.reduce(
     (total, sale) => total + (sale?.total_paid || 0),
@@ -50,11 +75,11 @@ export default async function Home() {
   const paidToday = paidOrdersToday[0]?.total_paid || 0;
   const unPaidToday = unpaidOrdersToday[0]?.total_paid || 0;
 
-  const milkCostToday = milk?.[0]?.Bought_at * milk?.[0]?.Amount || 0;
+  const milkCostToday = milk[0]?.Bought_at * milk[0]?.Amount || 0;
   const grossProfit = paidToday - milkCostToday;
-  const expectedProfit = milk?.[0]?.Selling_price * milk?.[0]?.Amount || 0;
+  const expectedProfit = milk[0]?.Selling_price * milk[0]?.Amount || 0;
 
-  // Graph data
+  // Graph data calculations (same as before)
   const salesDates = paidOrders.reduce((acc, order) => {
     const orderDate = DateTime.fromISO(order?.sale_date).toFormat("yyyy-MM-dd");
     if (!acc.includes(orderDate)) {
