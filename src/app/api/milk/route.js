@@ -5,27 +5,29 @@ export async function POST(req) {
   try {
     const { Amount, Cost, Date, sellingPrice, buyingPrice } = await req.json();
 
-    const checkRemaining = `SELECT AmountRemaining FROM Milk ORDER BY Date DESC LIMIT 1`;
+    const checkRemaining = `SELECT Amount_Remaining FROM Milk ORDER BY Date DESC LIMIT 1`;
     const result = await query(checkRemaining);
     let prevAmount = 0;
-    console.log(result, "prev");
-    if (result && result.length > 0 && result[0].AmountRemaining !== null) {
-      prevAmount = result[0].AmountRemaining;
-    }
-    console.log(Amount, "milk milk added in server");
-    const totalAmount = parseFloat(Amount) + parseFloat(prevAmount);
-    console.log(totalAmount, Amount, prevAmount, "amount");
+    let accumulatingCost = 0;
 
-    const addMilkQuery = `INSERT INTO MILK (Amount,Bought_at,AmountRemaining, Cost,Date,Selling_price,AmountSold) VALUES (?, ?,?,?,?,?,0) RETURNING*`;
+    if (result && result.length > 0 && result[0].Amount_Remaining !== null) {
+      prevAmount = result[0].Amount_Remaining;
+      accumulatingCost = prevAmount * result[0].Bought_at;
+    }
+
+    const totalAmount = parseFloat(Amount) + parseFloat(prevAmount);
+    const newTotal = parseFloat(accumulatingCost) + parseFloat(Cost);
+
+    const addMilkQuery = `INSERT INTO MILK (Amount,Bought_at,Amount_Remaining, Cost,Date,Selling_price,Amount_Sold) VALUES (?, ?,?,?,?,?,0) RETURNING*`;
     const results = await query(addMilkQuery, [
       Amount,
       buyingPrice,
       totalAmount,
-      Cost,
+      newTotal,
       Date,
       sellingPrice,
     ]);
-    console.log(results, "milk");
+
     return NextResponse.json(
       { data: results[0], message: "Milk added successfully" },
       { status: 201 }
@@ -39,22 +41,11 @@ export async function POST(req) {
   }
 }
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const date = searchParams.get("date");
-
-    let results;
-    if (date === "") {
-      const getMilk = `SELECT * FROM MILK ORDER BY Date DESC LIMIT 1`;
-      results = await query(getMilk);
-    } else {
-      const dateOnly = date.split("T")[0];
-
-      const getMilk = `SELECT * FROM MILK WHERE DATE(Date) = DATE($1)`;
-      results = await query(getMilk, [dateOnly]);
-    }
-
+    const getMilk = `SELECT * FROM MILK ORDER BY Date DESC LIMIT 1`;
+    const results = await query(getMilk);
+    console.log(results);
     return NextResponse.json({
       data: results[0],
       status: 201,

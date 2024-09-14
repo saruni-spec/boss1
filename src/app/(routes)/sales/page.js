@@ -1,10 +1,13 @@
 "use client";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
-const date = DateTime.local().toString();
+import styles from "@/app/components/Table.module.css";
 
-const Pending = () => {
+const Sales = () => {
   const [orders, setOrders] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(
+    DateTime.local().toISODate()
+  );
 
   const getOrders = async (date) => {
     const response = await fetch(`/api/orders/complete?date=${date}`);
@@ -13,29 +16,68 @@ const Pending = () => {
   };
 
   useEffect(() => {
-    getOrders(date);
-  }, []);
+    getOrders(selectedDate);
+  }, [selectedDate]);
+
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
 
   return (
-    <ul>
-      {orders.map((order) => (
-        <li key={order.id}>
-          <p>{order.Date_Sold}</p>
-          <p>{order.Milk_ordered}</p>
-          <p>{order.Bought_at}</p>
-          <p>{order.Total_Cost}</p>
-          <p>{order.Buyer}</p>
-          <p>{order.Date_Sold}</p>
-          <p>{order.Date_Paid}</p>
-          <p>{order.AmountPaid}</p>
-          <p>{order.Amount_Owed}</p>
-          <p>{order.BatchNo}</p>
-          <p>{order.isReconciled}</p>
-          <p>{order.customer_id}</p>
-        </li>
-      ))}
-    </ul>
+    <div className={styles.tableContainer}>
+      <h2 className={styles.tableTitle}>Sales Completed on Selected Date</h2>
+      <div className={styles.datePickerContainer}>
+        <label htmlFor="datePicker">Select Date: </label>
+        <input
+          type="date"
+          id="datePicker"
+          value={selectedDate}
+          onChange={handleDateChange}
+          max={DateTime.local().toISODate()}
+        />
+      </div>
+      {orders && orders.length > 0 ? (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Date Sold</th>
+              <th>Milk Ordered</th>
+              <th>Price</th>
+              <th>Total Cost</th>
+              <th>Buyer</th>
+              <th>Date Paid</th>
+              <th>Amount Paid</th>
+              <th>Amount Owed</th>
+              <th>Batch No</th>
+              <th>Reconciled</th>
+              <th>Customer ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.id}>
+                <td>{order.Date_Sold.split("T")[0]}</td>
+                <td>{order.Milk_ordered}</td>
+                <td>Ksh.{order.Bought_at}</td>
+                <td>Ksh.{order.Total_Cost}</td>
+                <td>{order.Buyer}</td>
+                <td>{order.Date_Paid.split("T")[0] || "N/A"}</td>
+                <td>Ksh.{order.Amount_Paid}</td>
+                <td>Ksh.{order.Amount_Owed}</td>
+                <td>{order.Batch_No}</td>
+                <td>{order.isReconciled ? "Yes" : "No"}</td>
+                <td>{order.customer_id}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className={styles.noData}>
+          No Sales Completed on {`${selectedDate}`}
+        </p>
+      )}
+    </div>
   );
 };
 
-export default Pending;
+export default Sales;

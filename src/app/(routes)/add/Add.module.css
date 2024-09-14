@@ -1,0 +1,67 @@
+.formContainer {
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--gadient-color);
+    padding: 24px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .formTitle {
+    font-size: 24px;
+    color: var(--contrast-color);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .formGroup {
+    margin-bottom: 20px;
+  }
+  
+  .label {
+    display: block;
+    font-size: 14px;
+    color: var(--gradient-color);
+    margin-bottom: 5px;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid var(--gradient-color);
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: var(--contrast-color);
+  }
+  
+  .stockAmount,
+  .totalCost {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--gadient-color);
+  }
+  
+  .addButton {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--contrast-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .addButton:hover {
+    background-color: var(--contrast-color);
+  }
+  
+  .addButton:active {
+    background-color: var(--contrast-color);
+  }

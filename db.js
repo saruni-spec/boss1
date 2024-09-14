@@ -21,7 +21,7 @@ async function openDb() {
         driver: sqlite3.Database,
       });
       console.log(`Successfully opened database: ${dbPath}`);
-
+      initDb(db);
       pool.push(db);
       return db;
     } catch (error) {
@@ -47,30 +47,30 @@ async function initDb(db) {
       );
 
       CREATE TABLE IF NOT EXISTS Milk (
-        BatchNo INTEGER PRIMARY KEY AUTOINCREMENT,
+        Batch_No INTEGER PRIMARY KEY AUTOINCREMENT,
         Amount NUMERIC,
         Bought_at,
         Date DATETIME,
         Cost NUMERIC,
         Selling_price NUMERIC,
-        AmountSold NUMERIC,
-        AmountRemaining NUMERIC
+        Amount_Sold NUMERIC,
+        Amount_Remaining NUMERIC
       );
 
       CREATE TABLE IF NOT EXISTS Sales (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        Milk_ordered NUMERIC,
-        Bought_at NUMERIC,
+        Milk_Ordered NUMERIC,
+        Bought_At NUMERIC,
         Total_Cost NUMERIC,
         Buyer TEXT,
         Payer TEXT,
         Date_Sold DATETIME,
         Date_Paid DATETIME,
-        AmountPaid NUMERIC,
+        Amount_Paid NUMERIC,
         Amount_Owed NUMERIC,
-        BatchNo INTEGER,
+        Batch_No INTEGER,
         Payment_Status BOOLEAN DEFAULT FALSE,
-        customer_id INTEGER,
+        Customer_id INTEGER,
         Payment_id INTEGER,
         FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
         FOREIGN KEY (Payment_id) REFERENCES Payments(id)
@@ -79,9 +79,10 @@ async function initDb(db) {
       CREATE TABLE IF NOT EXISTS Payments(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       Paid_by TEXT NOT NULL,
-      Amount_paid NUMERIC,
+      Amount_Paid NUMERIC,
       Time DATETIME,
-      Transaction_ID TEXT,
+      isReconcilled BOOLEAN DEFAULT FALSE,
+      Transaction_ID TEXT
       );
     `);
     console.log("All tables initialized successfully.");

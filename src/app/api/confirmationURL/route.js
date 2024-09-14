@@ -36,7 +36,7 @@ export async function POST(req) {
       LastName
     );
     const addPayment = `INSERT INTO PAYMENTS (Paid_by,
-      Amount_paid,
+      Amount_Paid,
       Time,
       Transaction_ID) VALUES(?,?,?,?)`;
 

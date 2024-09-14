@@ -1,42 +1,64 @@
+"use client";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import styles from "@/app/components/Table.module.css";
 
 const Payments = () => {
   const [payments, setPayments] = useState(null);
-  const [shops, setShops] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const getPAyments = async () => {
+  const getPayments = async () => {
     const date = DateTime.local().toString();
-    const response = await fetch(`/api/payments?date=${date}`);
+    const response = await fetch(`/api/payments`);
     const results = await response.json();
     setPayments(results.data);
   };
 
-  const getShops = async () => {
-    const response = await fetch(`/api/shops`);
-    const results = await response.json();
-    setShops(results.data);
-  };
-
   useEffect(() => {
-    getPAyments();
-    getShops();
+    getPayments();
   }, []);
+
+  const filteredPayments = payments?.filter((payment) =>
+    payment.Paid_by.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <ul>
-      {payments ? (
-        payments.map((payment) => (
-          <li key={payment.id}>
-            <p>{payment.Paid_by}</p>
-            <p>{payment.Amount_paid}</p>
-            <p>{payment.Time}</p>
-            <p>{payment.Transaction_ID}</p>
-          </li>
-        ))
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Payments Made Today</h2>
+      <input
+        type="text"
+        placeholder="Search by user..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className={styles.searchInput}
+      />
+      {filteredPayments && filteredPayments.length > 0 ? (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Paid By</th>
+              <th>Amount Paid</th>
+              <th>Time</th>
+              <th>Transaction ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPayments.map((payment) => (
+              <tr key={payment.Transaction_ID}>
+                <td>{payment.Paid_by}</td>
+                <td>${payment.Amount_Paid}</td>
+                <td>{`${payment.Time.split("T")[0]} : ${
+                  payment.Time.split("T")[1].split("+")[0]
+                }`}</td>
+                <td>{payment.Transaction_ID}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
-        <>No Payments Made Today</>
+        <p>No Payments Found</p>
       )}
-    </ul>
+    </div>
   );
 };
 

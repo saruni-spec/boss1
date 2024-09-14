@@ -1,0 +1,118 @@
+.orderListContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .orderList {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .orderCard {
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--gadient-color);
+    margin-bottom: 20px;
+    padding: 20px;
+  }
+  
+  .orderHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .orderTitle {
+    font-size: 20px;
+    color: var(--contrast-color);
+    margin: 0;
+  }
+  
+  .orderDate {
+    font-size: 14px;
+    color: var(--gradient-color);
+  }
+  
+  .orderDetails p {
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  
+  .orderActions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 15px;
+  }
+  
+  .actionButton {
+    background-color: var(--contrast-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+  }
+  
+  .actionButton:hover {
+    background-color: var(--contrast-color);
+  }
+  
+  .paymentForm {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gradient-color);
+  }
+  
+  .inputGroup {
+    margin-bottom: 15px;
+  }
+  
+  .label {
+    display: block;
+    font-size: 14px;
+    color: var(--gradient-color);
+    margin-bottom: 5px;
+  }
+  
+  .input,
+  .select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid var(--gradient-color);
+    border-radius: 4px;
+  }
+  
+  .orDivider {
+    text-align: center;
+    font-size: 14px;
+    color: var(--gradient-color);
+    margin: 15px 0;
+  }
+  
+  .submitButton {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+  }
+  
+  .submitButton:hover {
+    background-color: #27ae60;
+  }
+  
+  .noOrders {
+    text-align: center;
+    font-size: 18px;
+    color: var(--gradient-color);
+  }

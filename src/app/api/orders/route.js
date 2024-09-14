@@ -18,11 +18,11 @@ export async function POST(req) {
 
     const checkExistingUser = `SELECT * FROM customers WHERE shop_name = ? LIMIT 1;`;
     const reduceMilk = `UPDATE Milk 
-    SET AmountSold = AmountSold + ?, 
-        AmountRemaining = AmountRemaining - ? 
-    WHERE BatchNo = ?`;
+    SET Amount_Sold = Amount_Sold + ?, 
+        Amount_Remaining = Amount_Remaining - ? 
+    WHERE Batch_No = ?`;
     const addOrder = `INSERT INTO Sales 
-    (Milk_ordered,Bought_at,Total_Cost,Buyer,Payer,Date_Sold,Date_Paid,AmountPaid,Amount_Owed,BatchNo,Payment_Status,customer_id)
+    (Milk_ordered,Bought_at,Total_Cost,Buyer,Payer,Date_Sold,Date_Paid,Amount_Paid,Amount_Owed,Batch_No,Payment_Status,customer_id)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
     `;
     const user = await query(checkExistingUser, [name]);
@@ -75,12 +75,11 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const date = searchParams.get("date");
-    const geSales = `SELECT * FROM Sales WHERE Date = ? `;
-    const { rows } = await query(geSales, [date]);
+    const geSales = `SELECT * FROM Sales WHERE Payment_Status=FALSE ORDER BY Date_Sold DESC`;
+    const sales = await query(geSales);
+
     return NextResponse.json({
-      data: rows,
+      data: sales,
       status: 201,
     });
   } catch (error) {

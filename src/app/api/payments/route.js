@@ -3,10 +3,8 @@ import { NextResponse } from "next/server";
 
 export async function GET(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const date = searchParams.get("date");
     const getMilk = `SELECT * FROM Payments ORDER BY Time DESC `;
-    const { rows } = await query(getMilk, [date]);
+    const { rows } = await query(getMilk);
     return NextResponse.json({
       data: rows,
       status: 201,
@@ -24,7 +22,7 @@ export async function POST(req) {
     const { sales_id, payer, date, amountOwed, amountPaid, paymentStatus } =
       await req.json();
     if (amountOwed) {
-      const reconsileSale = `UPDATE Sales SET Payer=?,Date_paid=?,Amount_paid=?,Amount_owed=?,Payment_status=? WHERE id=?`;
+      const reconsileSale = `UPDATE Sales SET Payer=?,Date_Paid=?,Amount_Paid=?,Amount_Owed=?,Payment_Status=? WHERE id=?`;
       await query(reconsileSale, [
         date,
         payer,
@@ -34,7 +32,7 @@ export async function POST(req) {
         sales_id,
       ]);
     } else {
-      const reconsileSale = `UPDATE Sales SET Payer=Buyer,Date_paid=?,Amount_paid=Total_Cost,Amount_owed=0,Payment_status=TRUE WHERE id=?`;
+      const reconsileSale = `UPDATE Sales SET Payer=Buyer,Date_Paid=?,Amount_Paid=Total_Cost,Amount_Owed=0,Payment_Status=TRUE WHERE id=?`;
       await query(reconsileSale, [date, sales_id]);
     }
 

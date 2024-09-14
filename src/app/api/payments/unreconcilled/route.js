@@ -1,4 +1,4 @@
-import { query } from "../../../../db";
+import { query } from "../../../../../db";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
@@ -13,7 +13,7 @@ export async function POST(req) {
       paymentStatus,
     } = await req.json();
 
-    const reconsileSale = `UPDATE Sales SET Payer=?,Date_paid=?,Amount_paid=?,Amount_owed=?,Payment_status=?,Payment_id=? WHERE id=?`;
+    const reconsileSale = `UPDATE Sales SET Payer=?,Date_Paid=?,Amount_Paid=?,Amount_Owed=?,Payment_Status=?,Payment_id=? WHERE id=?`;
 
     await query(reconsileSale, [
       payer,
@@ -38,12 +38,10 @@ export async function POST(req) {
   }
 }
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const date = searchParams.get("date");
-    const getMilk = `SELECT * FROM Payments WHERE Date = $1 AND isreconcilled=FALSE `;
-    const { rows } = await query(getMilk, [date]);
+    const getMilk = `SELECT * FROM Payments WHERE isReconcilled=FALSE ORDER BY Time DESC`;
+    const { rows } = await query(getMilk);
     return NextResponse.json({
       data: rows,
       status: 201,

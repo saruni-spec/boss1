@@ -1,11 +1,15 @@
+import { NextResponse } from "next/server";
+import { query } from "../../../../../db";
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
-    const getSales = `SELECT * FROM Sales WHERE Date = ? AND Payment_Status=TRUE`;
-    const { rows } = await query(getSales, [date]);
+    const dateOnly = date.split("T")[0];
+    const getSales = `SELECT * FROM Sales WHERE DATE(Date_Sold) = DATE(?) AND Payment_Status=TRUE`;
+    const results = await query(getSales, [dateOnly]);
     return NextResponse.json({
-      data: rows,
+      data: results,
       status: 201,
     });
   } catch (error) {
