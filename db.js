@@ -37,6 +37,16 @@ async function openDb() {
 async function initDb(db) {
   console.log("Initializing database tables...");
   try {
+    const tables = await db.all(`
+      SELECT name FROM sqlite_master WHERE type='table' AND name IN ('Customers', 'Milk', 'Sales', 'Payments');
+    `);
+
+    // If tables already exist, skip initialization
+    if (tables.length > 0) {
+      console.log("Database already initialized.");
+      return;
+    }
+
     await db.exec(`
       CREATE TABLE IF NOT EXISTS Customers (
         customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
