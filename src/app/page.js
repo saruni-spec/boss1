@@ -59,7 +59,7 @@ ORDER BY
   } catch (error) {
     console.log("Error", error);
     return NextResponse.json({
-      message: "Error fetching Orders last 10 days",
+      message: "Error fetching the Orders last 10 days",
       status: 500,
     });
   }
