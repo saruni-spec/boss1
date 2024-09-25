@@ -1,3 +1,4 @@
+// Client Component (Sales.js)
 "use client";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
@@ -56,12 +57,16 @@ const Sales = () => {
           <tbody>
             {orders.map((order) => (
               <tr key={order.id}>
-                <td>{order.Date_Sold.split("T")[0]}</td>
+                <td>{DateTime.fromISO(order.Date_Sold).toISODate()}</td>
                 <td>{order.Milk_ordered}</td>
                 <td>Ksh.{order.Bought_at}</td>
                 <td>Ksh.{order.Total_Cost}</td>
                 <td>{order.Buyer}</td>
-                <td>{order.Date_Paid.split("T")[0] || "N/A"}</td>
+                <td>
+                  {order.Date_Paid
+                    ? DateTime.fromISO(order.Date_Paid).toISODate()
+                    : "N/A"}
+                </td>
                 <td>Ksh.{order.Amount_Paid}</td>
                 <td>Ksh.{order.Amount_Owed}</td>
                 <td>{order.Batch_No}</td>
@@ -72,9 +77,7 @@ const Sales = () => {
           </tbody>
         </table>
       ) : (
-        <p className={styles.noData}>
-          No Sales Completed on {`${selectedDate}`}
-        </p>
+        <p className={styles.noData}>No Sales Completed on {selectedDate}</p>
       )}
     </div>
   );

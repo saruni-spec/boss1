@@ -24,26 +24,31 @@ const Orders = () => {
       alert("Out of Stock");
       return;
     }
-    if (amountPaid > amountOwed) {
+    if (amountPaid > total) {
       alert("Error with amount paid");
+      return;
     }
     const dateSold = DateTime.fromFormat(orderDate, "yyyy-MM-dd").toISO();
     const datePaid = payment ? dateSold : null;
-    const paymentStatus = amountPaid === total ? true : false;
+    console.log(amountPaid, total, "tt");
+    const paymentStatus =
+      parseFloat(amountPaid) === parseFloat(total) ? true : false;
+    const orderData = {
+      amount,
+      price,
+      total,
+      name,
+      dateSold,
+      datePaid,
+      amountPaid,
+      amountOwed,
+      batchNo,
+      paymentStatus,
+    };
+    console.log(orderData, "order");
     const results = await fetch("/api/orders", {
       method: "POST",
-      body: JSON.stringify({
-        amount,
-        price,
-        total,
-        name,
-        dateSold,
-        datePaid,
-        amountPaid,
-        amountOwed,
-        batchNo,
-        paymentStatus,
-      }),
+      body: JSON.stringify(orderData),
     });
 
     getTodaysMilkPrice();
@@ -76,7 +81,7 @@ const Orders = () => {
   };
 
   const makePayment = (amount) => {
-    if (amountPaid > amountOwed) {
+    if (amountPaid > total) {
       setMessage("Error :Amount paid exceeds amount owed");
     } else {
       setMessage(null);
@@ -90,7 +95,7 @@ const Orders = () => {
     const date = DateTime.local().toString();
     const response = await fetch(`/api/milk`);
     const results = await response.json();
-    console.log(results.data);
+
     if (results.data) {
       setStock(results.data.Amount_Remaining);
       setPrice(results.data.Selling_price);

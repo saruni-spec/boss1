@@ -121,9 +121,16 @@ const Pending = () => {
                 </p>
                 <p>
                   <strong>Date Paid:</strong>{" "}
-                  {`${order.Date_Paid.split("T")[0]} : ${
-                    order.Date_Paid.split("T")[1].split("+")[0]
-                  }` || "Not Paid"}
+                  {order.Date_Paid ? (
+                    <>
+                      {" "}
+                      {`${order.Date_Paid.split("T")[0]} : ${
+                        order.Date_Paid.split("T")[1].split("+")[0]
+                      }` || "Not Paid"}
+                    </>
+                  ) : (
+                    <>Not Paid</>
+                  )}
                 </p>
                 <p>
                   <strong>Amount Owed:</strong> Ksh.{order.Amount_Owed}
